@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document 2</title>
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+</head>
+<button id="listen2">Add rect</button>
+<button id="rotate">Rotate</button>
+<span>Количество очков:</span>
+<span id="result"></span>
+<body>
+</body>
+<script>
+var Example = Example || {};
+
+Example.mixed = function() {
+    var Engine = Matter.Engine,
+        Render = Matter.Render,
+        Runner = Matter.Runner,
+        Composites = Matter.Composites,
+        Common = Matter.Common,
+        MouseConstraint = Matter.MouseConstraint,
+        Mouse = Matter.Mouse,
+        Composite = Matter.Composite,
+        Bodies = Matter.Bodies;
+        Body = Matter.Body;
+
+    // create engine
+    var engine = Engine.create(), world = engine.world;
+    world.gravity.y = 0;
+
+    // create renderer
+    var render = Render.create({
+        element: document.body,
+        engine: engine,
+        options: {
+            width: 800,
+            height: 800,
+            showAngleIndicator: true,
+        }
+    });
+
+    Render.run(render);
+
+    var runner = Runner.create();
+    Runner.run(runner, engine);
+
+    var w=700
+    var h=700
+
+    var counter=0
+    counter+=1
+    var blocks = []
+    let init_block=Bodies.rectangle(100, 100, w/(counter+1), w/counter, {
+        restitution: 0,
+        friction: 0,
+        inertia: Infinity,
+    });
+    blocks.push(init_block)
+    Composite.add(world,[init_block])
+
+    $('#result').html(counter);
+
+    Composite.add(world, [
+        // walls
+        Bodies.rectangle(400, 0, 800, 100, { isStatic: true }),
+        Bodies.rectangle(400, 800, 800, 100, { isStatic: true }),
+        Bodies.rectangle(800, 400, 100, 800, { isStatic: true }),
+        Bodies.rectangle(0, 400, 100, 800, { isStatic: true })
+    ]);
+
+    // add mouse control
+    var mouse = Mouse.create(render.canvas),
+        mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: {
+                    visible: false
+                }
+            }
+        });
+
+    Composite.add(world, mouseConstraint);
+
+    render.mouse = mouse;
+
+    Render.lookAt(render, {
+        min: { x: 0, y: 0 },
+        max: { x: 800, y: 800 }
+    });
+
+    document.getElementById('listen2').addEventListener(
+    'click',
+        function() {
+            counter+=1;
+            let block=Bodies.rectangle(100, 100,  w/(counter+1), w/counter, {
+                restitution: 0,
+                friction: 0,
+                inertia: Infinity,
+            });
+            Composite.add(world,[block])
+            blocks.forEach(function(item){
+                Body.setStatic( item, true)
+            })
+            blocks.push(block)
+            $('#result').html(counter);
+        },
+        false
+    );
+
+    
+    $('#rotate').on('click', function () {
+        Body.rotate(blocks[blocks.length - 1], Math.PI/2);
+    });
+
+
+    // context for MatterTools.Demo
+    return {
+        engine: engine,
+        runner: runner,
+        render: render,
+        canvas: render.canvas,
+        stop: function() {
+            Matter.Render.stop(render);
+            Matter.Runner.stop(runner);
+        }
+    };
+};
+
+Example.mixed();
+</script>
+</html>
