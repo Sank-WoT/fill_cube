@@ -10,6 +10,7 @@
 </head>
 <button id="listen2">Add rect</button>
 <button id="rotate">Rotate</button>
+<button id="undo">Undo</button>
 <span>Количество очков:</span>
 <span id="result"></span>
 <body>
@@ -49,18 +50,23 @@ Example.mixed = function() {
     var runner = Runner.create();
     Runner.run(runner, engine);
 
-    var w=700
-    var h=700
+    var w=700;
+    var h=700;
 
-    var counter=0
-    counter+=1
-    var blocks = []
+    var zoom = 1;
+
+    var counter=0;
+    counter+=1;
+    var blocks = [];
+
     let init_block=Bodies.rectangle(100, 100, w/(counter+1), w/counter, {
         restitution: 0,
         friction: 0,
         inertia: Infinity,
     });
+
     blocks.push(init_block)
+
     Composite.add(world,[init_block])
 
     $('#result').html(counter);
@@ -103,20 +109,64 @@ Example.mixed = function() {
                 friction: 0,
                 inertia: Infinity,
             });
-            Composite.add(world,[block])
+            Composite.add(world, [block]);
             blocks.forEach(function(item){
-                Body.setStatic( item, true)
-            })
-            blocks.push(block)
+                Body.setStatic( item, true);
+            });
+            blocks.push(block);
             $('#result').html(counter);
         },
         false
     );
 
+    //Matter.Events.on(mouseConstraint, 'startdrag', function(event) {
+    //    dragBody = event.body;
+    //    console.log(dragBody);
+    //});
+
     
     $('#rotate').on('click', function () {
         Body.rotate(blocks[blocks.length - 1], Math.PI/2);
     });
+
+    $('#undo').on('click', function () {
+        if(counter > 1) {
+            Composite.remove(engine.world, blocks[blocks.length - 1]);
+            console.log(blocks);
+            blocks.pop();
+            Body.setStatic(blocks[blocks.length - 1], false);
+            counter-=1;
+            $('#result').html(counter);
+        }
+    });
+
+    //Matter.Events.on(engine, 'beforeTick', function() {
+     //   console.log('test');
+     //   var canvas = document.getElementsByTagName('canvas')[0];
+     //   var ctx = canvas.getContext("2d");
+      //  ctx.translate(w/2, w/2);
+      //  ctx.scale(this.zoom, this.zoom);
+     //   ctx.translate(-w/2, -w/2);  
+
+        // center view at player 
+     //   Bounds.shift(this.render.bounds,
+    //    {
+     //       x: player.position.x - w / 2,
+     //       y: player.position.y - w / 2
+     //   });
+    //});
+
+    //$(document).keydown(function( event ) {
+    //    if (event.key == '-') {
+    //        zoom *= 0.9;
+     //       console.log('-');
+    //    }
+    //    if (event.key == '+') {
+    //        zoom *= 1.1;
+    //        console.log('+');
+    //    }
+
+    //});
 
 
     // context for MatterTools.Demo
@@ -133,5 +183,48 @@ Example.mixed = function() {
 };
 
 Example.mixed();
+
+//$(function() {
+//    var canvas=document.getElementsByTagName("canvas")[0];
+//    var ctx=canvas.getContext("2d");
+
+    // Initial scale and zoom settings
+//    var scale = 1;
+//    var zoomSpeed = 0.1; // Adjust this value to control zoom speed
+
+    // Add event listener for mouse wheel
+ //   canvas.addEventListener("wheel", handleWheel);
+
+  //  function handleWheel(event) {
+   //     console.log('wheel');
+    //    event.preventDefault(); // Prevent default scrolling behavior
+
+     //   var delta = event.deltaY; // Get the scroll direction
+
+        // Adjust the scale based on the scroll direction
+      //  if (delta < 0) {
+            // Zoom in
+        //    scale += zoomSpeed;
+        //} else {
+            // Zoom out
+          //  scale -= zoomSpeed;
+        //}
+
+        // Limit the scale to a minimum and maximum value if desired
+        //var minScale = 0.1;
+        //var maxScale = 2;
+        //scale = Math.max(minScale, Math.min(scale, maxScale));
+
+        // Apply the scale transformation to the canvas
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //ctx.scale(scale, scale);
+
+        // Reset the scale transformation for future operations
+        //ctx.setTransform(1, 0, 0, 1, 0, 0);
+    //}
+//});
+
+
+
 </script>
 </html>
